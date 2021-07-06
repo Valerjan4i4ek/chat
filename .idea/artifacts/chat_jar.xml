@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="chat:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/chat_jar</output-path>
+    <root id="archive" name="chat.jar">
+      <element id="module-output" name="chat" />
+      <element id="module-output" name="ServerMain" />
+      <element id="module-output" name="ClientMain" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/google/protobuf/protobuf-java/3.11.4/protobuf-java-3.11.4.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/google/code/gson/gson/2.2.4/gson-2.2.4.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/mysql/mysql-connector-java/8.0.23/mysql-connector-java-8.0.23.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/out/artifacts/chat_jar/chat.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
