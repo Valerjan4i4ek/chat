@@ -15,7 +15,7 @@ public class Client {
     public static void main(String[] args) throws IOException, NotBoundException, RemoteException {
 
         authorization();
-        chooseRoom();
+//        chooseRoom();
     }
 
     public static void authorization() throws IOException, NotBoundException, RemoteException{
@@ -24,7 +24,8 @@ public class Client {
         Chat chat = (Chat) registry.lookup(UNIQUE_BINDING_NAME);
 
         System.out.println("Enter you login and password");
-        chat.checkAuthorization(reader.readLine(), reader.readLine());
+        String result = chat.checkAuthorization(reader.readLine(), reader.readLine());
+        System.out.println(result);
     }
 
     public static void chooseRoom() throws IOException, NotBoundException, RemoteException{
