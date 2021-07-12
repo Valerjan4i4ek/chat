@@ -15,7 +15,7 @@ public class Client {
     public static void main(String[] args) throws IOException, NotBoundException, RemoteException {
 
         authorization();
-//        chooseRoom();
+
     }
 
     public static void authorization() throws IOException, NotBoundException, RemoteException{
@@ -26,6 +26,9 @@ public class Client {
         System.out.println("Enter you login and password");
         String result = chat.checkAuthorization(reader.readLine(), reader.readLine());
         System.out.println(result);
+        if(!result.equals("incorrect password")){
+            chooseRoom();
+        }
     }
 
     public static void chooseRoom() throws IOException, NotBoundException, RemoteException{
@@ -33,8 +36,16 @@ public class Client {
 
         Chat chat = (Chat) registry.lookup(UNIQUE_BINDING_NAME);
 
-        System.out.println("Please! Choose room:");
-        chat.chooseRoom();
+        System.out.println("Please! Choose oom:");
+        List<String> list = chat.chooseRoom();
+        for (int i = 0; i < list.size(); i++) {
+            System.out.println(list.get(i));
+        }
+        for (int i = 0; i < list.size(); i++) {
+            if(reader.readLine().equals(list.get(i))){
+                System.out.println("Welcome to " + (i + 1) + " room");
+            }
+        }
     }
 
     public static void writeMessage() throws IOException, NotBoundException, RemoteException{
