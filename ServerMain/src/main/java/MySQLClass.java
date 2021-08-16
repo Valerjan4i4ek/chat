@@ -1,7 +1,6 @@
 import java.lang.reflect.InvocationTargetException;
 import java.sql.*;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class MySQLClass {
 
@@ -9,6 +8,7 @@ public class MySQLClass {
         baseCreate();
         tableMessageCreate();
         tableAuthorizationCreate();
+        rooms();
     }
 
     public Connection getConnection(String dbName) throws SQLException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
@@ -53,6 +53,45 @@ public class MySQLClass {
         }
     }
 
+    public void rooms(){
+        for (int i = 1; i <= 4; i++) {
+            createRooms(i);
+        }
+    }
+
+    public void createRooms(int i){
+        try{
+            Connection conn = null;
+            Statement st = null;
+
+            try{
+                conn = getConnection("chat");
+                st = conn.createStatement();
+                st.executeUpdate("CREATE TABLE IF NOT EXISTS chat.room" + i + "(id INT NOT NULL, message VARCHAR(100) NOT NULL)");
+            }
+            finally {
+                try{
+                    if(conn != null){
+                        conn.close();
+                    }
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+                try{
+                    if(st != null){
+                        st.close();
+                    }
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
     public void tableMessageCreate(){
         try{
             Connection conn = null;
@@ -62,7 +101,7 @@ public class MySQLClass {
                 conn = getConnection("chat");
                 st = conn.createStatement();
                 st.executeUpdate("CREATE TABLE IF NOT EXISTS chat.message " +
-                        "(id INT NOT NULL, message VARCHAR(100) NOT NULL)");
+                        "(id INT NOT NULL, room INT NOT NULL, message VARCHAR(100) NOT NULL)");
             }
             finally {
                 try{
@@ -128,7 +167,7 @@ public class MySQLClass {
 
             try{
                 conn = getConnection("chat");
-                ps = conn.prepareStatement("INSERT INTO message (id, message) VALUES (?, ?)");
+                ps = conn.prepareStatement("INSERT INTO room1 (id, message) VALUES (?, ?)");
                 ps.setInt(1, id);
                 ps.setString(2, message);
                 ps.executeUpdate();
@@ -238,5 +277,58 @@ public class MySQLClass {
         }
 
         return map;
+    }
+
+    public List<String> checkLastMessages(Integer room){
+        List<String> list = new ArrayList<>();
+
+        try{
+            Connection conn = null;
+            PreparedStatement ps = null;
+            ResultSet rs = null;
+
+            try{
+                conn = getConnection("chat");
+                String query = "SELECT * FROM room" + room;
+                ps = conn.prepareStatement(query);
+                rs = ps.executeQuery();
+
+                while (rs.next()){
+                    try{
+                        String message = rs.getString("message");
+
+                        list.add(message);
+                    } catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            } finally {
+                try{
+                    if(conn != null){
+                        conn.close();
+                    }
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+                try{
+                    if(ps != null){
+                        ps.close();
+                    }
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+                try{
+                    if(rs != null){
+                        rs.close();
+                    }
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return list;
     }
 }
