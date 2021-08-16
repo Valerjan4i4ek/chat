@@ -5,12 +5,16 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class Client {
 
     public static final String UNIQUE_BINDING_NAME = "server.chat";
     static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+    private static User user;
 
     public static void main(String[] args) throws IOException, NotBoundException, RemoteException {
 
@@ -24,7 +28,12 @@ public class Client {
         Chat chat = (Chat) registry.lookup(UNIQUE_BINDING_NAME);
 
         System.out.println("Enter you login and password");
-        String result = chat.checkAuthorization(reader.readLine(), reader.readLine());
+        String name = reader.readLine();
+        String password = reader.readLine();
+        user = new User(name, password);
+//        user.setUserName(name);
+//        user.setUserPassword(password);
+        String result = chat.checkAuthorization(name, password);
         System.out.println(result);
         if(!result.equals("incorrect password")){
             chooseRoom();
@@ -36,6 +45,7 @@ public class Client {
 
         Chat chat = (Chat) registry.lookup(UNIQUE_BINDING_NAME);
 
+
         System.out.println("Please! Choose oom:");
         List<String> list = chat.chooseRoom();
         for (int i = 0; i < list.size(); i++) {
@@ -43,19 +53,47 @@ public class Client {
         }
         for (int i = 0; i < list.size(); i++) {
             if(reader.readLine().equals(list.get(i))){
+                System.out.println();
+                System.out.println(user.getUserName() + " join to chat");
+                System.out.println();
                 System.out.println("Welcome to " + (i + 1) + " room");
+
+                checkMessage(i+1);
+
+                System.out.println("Write your message end press Enter:");
+                while (true){
+                    sendMessage(i+1, reader.readLine());
+                }
             }
         }
     }
 
-    public static void writeMessage() throws IOException, NotBoundException, RemoteException{
+    public static void sendMessage(Integer room, String message) throws IOException, NotBoundException, RemoteException{
         final Registry registry = LocateRegistry.getRegistry("127.0.0.1",2732);
 
         Chat chat = (Chat) registry.lookup(UNIQUE_BINDING_NAME);
+        String m = chat.sendMessage(room, message);
+        SimpleDateFormat date = new SimpleDateFormat("HH:mm");
+        System.out.println(user.getUserName() + " " + date.format(new Date()) + ": " + message);
 
-        System.out.println("Write your message end press Enter:");
-        String message = chat.sendMessage(reader.readLine());
+    }
 
-        System.out.println(message);
+    public static void checkMessage(Integer room) throws IOException, NotBoundException, RemoteException{
+        final Registry registry = LocateRegistry.getRegistry("127.0.0.1",2732);
+
+        Chat chat = (Chat) registry.lookup(UNIQUE_BINDING_NAME);
+        List<String> list = chat.checkMessage(room);
+
+        int count = 0;
+
+
+        System.out.println();
+        for(int i = list.size()-1; i>0; i--){
+            count++;
+            if(count == 10){
+                break;
+            }
+            System.out.println(list.get(i));
+        }
     }
 }
