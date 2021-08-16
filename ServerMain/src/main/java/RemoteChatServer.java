@@ -3,9 +3,8 @@ import com.google.gson.Gson;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.rmi.RemoteException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class RemoteChatServer implements Chat{
@@ -77,11 +76,31 @@ public class RemoteChatServer implements Chat{
     public void incrementAuthorization(){countAuthorization++;}
 
     @Override
-    public String sendMessage(String message) throws RemoteException {
+    public String sendMessage(Integer room, String message) throws RemoteException {
+        Thread run = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(true){
+                    try {
+                        sql.addMessage(countMessage, message);
+                        incrementMessage();
+                        Thread.sleep(500);
+                    } catch (InterruptedException ex) {
+                    }
+                }
+            }
+        });
+        run.start();
+
         sql.addMessage(countMessage, message);
         incrementMessage();
-        return message;
+
+        return "";
     }
 
-
+    @Override
+    public List<String> checkMessage(Integer room) throws RemoteException {
+        List<String> list = sql.checkLastMessages(room);
+        return list;
+    }
 }
