@@ -160,14 +160,14 @@ public class MySQLClass {
         }
     }
 
-    public void addMessage(Integer id, String message){
+    public void addMessage(Integer room, Integer id, String message){
         try{
             Connection conn = null;
             PreparedStatement ps = null;
 
             try{
                 conn = getConnection("chat");
-                ps = conn.prepareStatement("INSERT INTO room1 (id, message) VALUES (?, ?)");
+                ps = conn.prepareStatement("INSERT INTO room" + room + " (id, message) VALUES (?, ?)");
                 ps.setInt(1, id);
                 ps.setString(2, message);
                 ps.executeUpdate();
