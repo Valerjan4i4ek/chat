@@ -13,7 +13,6 @@ public class Client {
     public static final String UNIQUE_BINDING_NAME = "server.chat";
     static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
     private static User user;
-    private static Rooms rooms;
 
     public static void main(String[] args) throws IOException, NotBoundException, RemoteException {
 
@@ -61,13 +60,20 @@ public class Client {
                 checkMessage(i+1);
 
                 System.out.println("Write your message end press Enter:");
-//                sendMessage(i+1, reader.readLine());
+
                 while (true){
+                    try {
+                        Thread.sleep(500);
+                        checkLastMessage(i+1);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     sendMessage(i+1, reader.readLine());
-                    new ChatThread(i+1).start();
+//                    new ChatThread(i+1).start();
                 }
             }
         }
+
     }
 
     public static void sendMessage(Integer room, String message) throws IOException, NotBoundException, RemoteException{
@@ -87,7 +93,6 @@ public class Client {
 
         int count = 0;
 
-
         System.out.println();
         for(int i = list.size()-1; i>0; i--){
             count++;
@@ -96,52 +101,28 @@ public class Client {
             }
             System.out.println(list.get(i));
         }
+
+//        checkLastMessage(room);
+
     }
 
-//    public static void checkLastMessage(Integer room) throws IOException, NotBoundException, RemoteException{
-//        final Registry registry = LocateRegistry.getRegistry("127.0.0.1",2732);
-//
-//        Chat chat = (Chat) registry.lookup(UNIQUE_BINDING_NAME);
-//        List<String> list = chat.checkMessage(room);
-//        System.out.println();
-//
-//        for (int i = 0; i < list.size(); i++) {
+    public static void checkLastMessage(Integer room) throws IOException, NotBoundException, RemoteException{
+        final Registry registry = LocateRegistry.getRegistry("127.0.0.1",2732);
+
+        Chat chat = (Chat) registry.lookup(UNIQUE_BINDING_NAME);
+        List<String> list = chat.checkMessage(room);
+        System.out.println();
+
+        new Thread(() -> {
+            System.out.println(list.get(list.size() - 1));
+        }).start();
+
+
+//        for (int i = list.size() -1; i > 0; i++) {
 //            System.out.println(list.get(list.size() - 1));
 //        }
-//    }
 
-    static class ChatThread extends Thread{
-        private final int room;
-
-        ChatThread (int room){
-            this.room = room;
-        }
-
-        public void run(){
-
-
-            try{
-                Thread.sleep(500);
-                final Registry registry;
-                Chat chat;
-                try {
-                    registry = LocateRegistry.getRegistry("127.0.0.1",2732);
-                    chat = (Chat) registry.lookup(UNIQUE_BINDING_NAME);
-                    List<String> list = chat.checkMessage(room);
-                    System.out.println();
-
-                    for (int i = 0; i < list.size(); i++) {
-                        System.out.println(list.get(list.size() - 1));
-                    }
-                } catch (RemoteException | NotBoundException e) {
-                    e.printStackTrace();
-                }
-
-            }
-            catch(InterruptedException e){
-                System.out.println("Thread has been interrupted");
-            }
-
-        }
     }
+
+
 }
