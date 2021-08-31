@@ -61,16 +61,38 @@ public class Client {
 
                 System.out.println("Write your message end press Enter:");
 
-                while (true){
-                    try {
-                        Thread.sleep(500);
-                        checkLastMessage(i+1);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                int finalI = i;
+                new Thread(() -> {
+                    while (!Thread.currentThread().isInterrupted()){
+                        try {
+                            Thread.sleep(5000);
+                            checkLastMessage(finalI +1);
+//                            sendMessage(finalI +1, reader.readLine());
+                        } catch (IOException | InterruptedException e) {
+                            e.printStackTrace();
+                        } catch (NotBoundException e) {
+                            e.printStackTrace();
+                        }
                     }
-                    sendMessage(i+1, reader.readLine());
-//                    new ChatThread(i+1).start();
-                }
+                }).start();
+                new Thread(() -> {
+                    while (!Thread.currentThread().isInterrupted()){
+                        try {
+//                            checkLastMessage(finalI +1);
+                            sendMessage(finalI +1, reader.readLine());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (NotBoundException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+
+//                while (!Thread.currentThread().isInterrupted()){
+//                    checkLastMessage(i+1);
+//                    sendMessage(i+1, reader.readLine());
+////                    new ChatThread(i+1).start();
+//                }
             }
         }
 
@@ -80,6 +102,7 @@ public class Client {
         final Registry registry = LocateRegistry.getRegistry("127.0.0.1",2732);
 
         Chat chat = (Chat) registry.lookup(UNIQUE_BINDING_NAME);
+
         String m = chat.sendMessage(room, message);
         SimpleDateFormat date = new SimpleDateFormat("HH:mm");
         System.out.println(user.getUserName() + " " + date.format(new Date()) + ": " + message);
@@ -113,16 +136,7 @@ public class Client {
         List<String> list = chat.checkMessage(room);
         System.out.println();
 
-        new Thread(() -> {
-            System.out.println(list.get(list.size() - 1));
-        }).start();
-
-
-//        for (int i = list.size() -1; i > 0; i++) {
-//            System.out.println(list.get(list.size() - 1));
-//        }
+        System.out.println(list.get(list.size() - 1));
 
     }
-
-
 }
