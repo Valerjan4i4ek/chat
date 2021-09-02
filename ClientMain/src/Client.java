@@ -13,6 +13,7 @@ public class Client {
     public static final String UNIQUE_BINDING_NAME = "server.chat";
     static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
     private static User user;
+    static List<String> checkList = new ArrayList<>();
 
     public static void main(String[] args) throws IOException, NotBoundException, RemoteException {
 
@@ -113,6 +114,7 @@ public class Client {
 
         Chat chat = (Chat) registry.lookup(UNIQUE_BINDING_NAME);
         List<String> list = chat.checkMessage(room);
+        checkList = list;
 
         int count = 0;
 
@@ -135,8 +137,63 @@ public class Client {
         Chat chat = (Chat) registry.lookup(UNIQUE_BINDING_NAME);
         List<String> list = chat.checkMessage(room);
         System.out.println();
+        
+        if(list.size() > checkList.size()){
+            list.removeAll(checkList);
+            for (int i = 0; i < list.size(); i++) {
+                System.out.println(list.get(i));
+            }
+        }
 
-        System.out.println(list.get(list.size() - 1));
+//        System.out.println(list.get(list.size() - 1));
 
     }
+
+
+//    public static void execute(Runnable task, long delaySec) {
+//        Timer timer = new Timer();
+//        TimerTask timerTask = new TimerTask() {
+//            @Override
+//            public void run() {
+//                task.run();
+//                timer.cancel();
+//            }
+//        };
+//        timer.schedule(timerTask, delaySec * 100);
+//    }
+
+//    static class ChatThread extends Thread{
+//        private final int room;
+//
+//        ChatThread (int room){
+//            this.room = room;
+//        }
+//
+//        public void run(){
+//
+//
+//            try{
+//                Thread.sleep(500);
+//                final Registry registry;
+//                Chat chat;
+//                try {
+//                    registry = LocateRegistry.getRegistry("127.0.0.1",2732);
+//                    chat = (Chat) registry.lookup(UNIQUE_BINDING_NAME);
+//                    List<String> list = chat.checkMessage(room);
+//                    System.out.println();
+//
+//                    for (int i = 0; i < list.size(); i++) {
+//                        System.out.println(list.get(list.size() - 1));
+//                    }
+//                } catch (RemoteException | NotBoundException e) {
+//                    e.printStackTrace();
+//                }
+//
+//            }
+//            catch(InterruptedException e){
+//                System.out.println("Thread has been interrupted");
+//            }
+//
+//        }
+//    }
 }
