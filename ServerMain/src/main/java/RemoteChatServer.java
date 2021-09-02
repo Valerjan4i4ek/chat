@@ -21,15 +21,17 @@ public class RemoteChatServer implements Chat{
     public String checkAuthorization(String login, String password) throws RemoteException {
         try{
             Map<String, String> map = sql.check();
-            if (map != null && !map.isEmpty()){
-                for (Map.Entry<String, String> entry : map.entrySet()){
-                    if (login.equals(entry.getKey())){
-                        if(!password.equals(entry.getValue())){
+            List<String> keys = new ArrayList<>(map.keySet());
+            if(map != null && !map.isEmpty()){
+                for (int i = 0; i < keys.size(); i++) {
+                    String key = keys.get(i);
+                    if(login.equals(keys.get(i))){
+                        if(!map.get(key).equals(password)){
                             System.out.println("incorrect password");
                             return "incorrect password";
                         }
-                        else {
-                            System.out.println("Ok");
+                        else{
+                            System.out.println("OK");
                             return "authorization is OK";
                         }
                     }
@@ -47,6 +49,32 @@ public class RemoteChatServer implements Chat{
                 System.out.println("new registration");
                 return "new registration";
             }
+//            if (map != null && !map.isEmpty()){
+//                for (Map.Entry<String, String> entry : map.entrySet()){
+//                    if (entry.getKey().equals(login)){
+//                        if(!entry.getValue().equals(password)){
+//                            System.out.println("incorrect password");
+//                            return "incorrect password";
+//                        }
+//                        else {
+//                            System.out.println("Ok");
+//                            return "authorization is OK";
+//                        }
+//                    }
+//                    else{
+//                        sql.addAuthorization(countAuthorization, new User(login, password));
+//                        incrementAuthorization();
+//                        System.out.println("new registration");
+//                        return "new registration";
+//                    }
+//                }
+//            }
+//            else{
+//                sql.addAuthorization(countAuthorization, new User(login, password));
+//                incrementAuthorization();
+//                System.out.println("new registration");
+//                return "new registration";
+//            }
 
         }catch (Exception e){
             e.printStackTrace();
