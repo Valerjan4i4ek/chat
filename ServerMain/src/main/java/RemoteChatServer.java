@@ -21,26 +21,20 @@ public class RemoteChatServer implements Chat{
     public String checkAuthorization(String login, String password) throws RemoteException {
         try{
             Map<String, String> map = sql.check();
-            List<String> keys = new ArrayList<>(map.keySet());
             if(map != null && !map.isEmpty()){
-                for (int i = 0; i < keys.size(); i++) {
-                    String key = keys.get(i);
-                    if(login.equals(keys.get(i))){
-                        if(!map.get(key).equals(password)){
-                            System.out.println("incorrect password");
-                            return "incorrect password";
-                        }
-                        else{
-                            System.out.println("OK");
-                            return "authorization is OK";
-                        }
-                    }
-                    else{
-                        sql.addAuthorization(countAuthorization, new User(login, password));
-                        incrementAuthorization();
-                        System.out.println("new registration");
-                        return "new registration";
-                    }
+                if(map.containsKey(login) && map.get(login).equals(password)){
+                    System.out.println("AUTHORIZATION IS OK");
+                    return "AUTHORIZATION IS OK";
+                }
+                else if(map.containsKey(login) && !map.get(login).equals(password)){
+                    System.out.println("INCORRECT PASSWORD");
+                    return "INCORRECT PASSWORD";
+                }
+                else{
+                    sql.addAuthorization(countAuthorization, new User(login, password));
+                    incrementAuthorization();
+                    System.out.println("NEW REGISTRATION");
+                    return "NEW REGISTRATION";
                 }
             }
             else{
@@ -49,37 +43,13 @@ public class RemoteChatServer implements Chat{
                 System.out.println("new registration");
                 return "new registration";
             }
-//            if (map != null && !map.isEmpty()){
-//                for (Map.Entry<String, String> entry : map.entrySet()){
-//                    if (entry.getKey().equals(login)){
-//                        if(!entry.getValue().equals(password)){
-//                            System.out.println("incorrect password");
-//                            return "incorrect password";
-//                        }
-//                        else {
-//                            System.out.println("Ok");
-//                            return "authorization is OK";
-//                        }
-//                    }
-//                    else{
-//                        sql.addAuthorization(countAuthorization, new User(login, password));
-//                        incrementAuthorization();
-//                        System.out.println("new registration");
-//                        return "new registration";
-//                    }
-//                }
-//            }
-//            else{
-//                sql.addAuthorization(countAuthorization, new User(login, password));
-//                incrementAuthorization();
-//                System.out.println("new registration");
-//                return "new registration";
-//            }
 
-        }catch (Exception e){
+        } catch (Exception e){
             e.printStackTrace();
         }
+
         return "";
+
     }
     @Override
     public List<String> chooseRoom() throws RemoteException {
@@ -111,7 +81,7 @@ public class RemoteChatServer implements Chat{
             while (true){
                 list.add(message);
                 try {
-                    Thread.sleep(10000);
+                    Thread.sleep(500);
                     for(String s : list){
                         sql.addMessage(room, countMessage, s);
                         incrementMessage();
