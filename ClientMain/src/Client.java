@@ -66,7 +66,7 @@ public class Client {
                 new Thread(() -> {
                     while (!Thread.currentThread().isInterrupted()){
                         try {
-                            Thread.sleep(5000);
+                            Thread.sleep(500);
                             checkLastMessage(finalI +1);
 //                            sendMessage(finalI +1, reader.readLine());
                         } catch (IOException | InterruptedException e) {
@@ -76,37 +76,22 @@ public class Client {
                         }
                     }
                 }).start();
-                new Thread(() -> {
-                    while (!Thread.currentThread().isInterrupted()){
-                        try {
-//                            checkLastMessage(finalI +1);
-                            sendMessage(finalI +1, reader.readLine());
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } catch (NotBoundException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }).start();
-
-//                while (!Thread.currentThread().isInterrupted()){
-//                    checkLastMessage(i+1);
-//                    sendMessage(i+1, reader.readLine());
-////                    new ChatThread(i+1).start();
-//                }
+                sendMessage(finalI +1, reader.readLine());
+                writeMessage(finalI +1, reader.readLine());
             }
         }
-
     }
 
     public static void sendMessage(Integer room, String message) throws IOException, NotBoundException, RemoteException{
+        SimpleDateFormat date = new SimpleDateFormat("HH:mm");
+        System.out.println(user.getUserName() + " " + date.format(new Date()) + ": " + message);
+    }
+
+    public static void writeMessage(Integer room, String message) throws IOException, NotBoundException, RemoteException{
         final Registry registry = LocateRegistry.getRegistry("127.0.0.1",2732);
 
         Chat chat = (Chat) registry.lookup(UNIQUE_BINDING_NAME);
-
         String m = chat.sendMessage(room, message);
-        SimpleDateFormat date = new SimpleDateFormat("HH:mm");
-        System.out.println(user.getUserName() + " " + date.format(new Date()) + ": " + message);
     }
 
     public static void checkMessage(Integer room) throws IOException, NotBoundException, RemoteException{
@@ -144,9 +129,6 @@ public class Client {
                 System.out.println(list.get(i));
             }
         }
-
-//        System.out.println(list.get(list.size() - 1));
-
     }
 
 
