@@ -67,6 +67,7 @@ public class Client {
                     while (!Thread.currentThread().isInterrupted()){
                         try {
                             sendMessage(finalI +1, reader.readLine());
+
                         } catch (IOException | NotBoundException e) {
                             e.printStackTrace();
                         }
@@ -106,7 +107,6 @@ public class Client {
         List<String> list = chat.checkMessage(room);
         checkList = list;
 
-
         int count = 0;
 
         System.out.println();
@@ -128,17 +128,18 @@ public class Client {
         Chat chat = (Chat) registry.lookup(UNIQUE_BINDING_NAME);
         List<String> list = chat.checkMessage(room);
 
-//        System.out.println();
+        list.removeAll(checkList);
 
-        if(list.size() > checkList.size()){
-            list.removeAll(checkList);
+
+        if(!list.isEmpty()){
             for (int i = 0; i < list.size(); i++) {
                 System.out.println(list.get(i));
+                checkList.add(list.get(i));
+                list.remove(list.get(i));
             }
         }
 
 
-//        System.out.println(list.get(list.size()-1));
     }
 
 }
