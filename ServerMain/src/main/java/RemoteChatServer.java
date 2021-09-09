@@ -76,24 +76,8 @@ public class RemoteChatServer implements Chat{
     @Override
     public String sendMessage(Integer room, String message) throws RemoteException {
 
-        List<String> list = new ArrayList<>();
-        new Thread(() -> {
-            while (true){
-                list.add(message);
-                try {
-                    Thread.sleep(500);
-                    for(String s : list){
-                        sql.addMessage(room, countMessage, s);
-                        incrementMessage();
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-
-//        sql.addMessage(room, countMessage, message);
-//        incrementMessage();
+        sql.addMessage(room, countMessage, message);
+        incrementMessage();
 
         return "";
     }
