@@ -1,6 +1,7 @@
 import java.lang.reflect.InvocationTargetException;
 import java.sql.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MySQLClass {
 
@@ -67,7 +68,7 @@ public class MySQLClass {
             try{
                 conn = getConnection("chat");
                 st = conn.createStatement();
-                st.executeUpdate("CREATE TABLE IF NOT EXISTS chat.room" + i + "(id INT NOT NULL, message VARCHAR(100) NOT NULL)");
+                st.executeUpdate("CREATE TABLE IF NOT EXISTS chat.room" + i + "(id INT NOT NULL, message VARCHAR(100) NOT NULL, user VARCHAR(100) NOT NULL)");
             }
             finally {
                 try{
@@ -160,16 +161,17 @@ public class MySQLClass {
         }
     }
 
-    public void addMessage(Integer room, Integer id, String message){
+    public void addMessage(Integer room, Integer id, String message, String user){
         try{
             Connection conn = null;
             PreparedStatement ps = null;
 
             try{
                 conn = getConnection("chat");
-                ps = conn.prepareStatement("INSERT INTO room" + room + " (id, message) VALUES (?, ?)");
+                ps = conn.prepareStatement("INSERT INTO room" + room + " (id, message, user) VALUES (?, ?, ?)");
                 ps.setInt(1, id);
                 ps.setString(2, message);
+                ps.setString(3, user);
                 ps.executeUpdate();
             } finally {
                 try{
@@ -279,8 +281,10 @@ public class MySQLClass {
         return map;
     }
 
-    public List<String> checkLastMessages(Integer room){
-        List<String> list = new ArrayList<>();
+    public Map<List<String>, List<String>> checkLastMessages(Integer room){
+        Map<List<String>, List<String>> map = new LinkedHashMap<>();
+        List<String> userList = new ArrayList<>();
+        List<String> messageList = new ArrayList<>();
 
         try{
             Connection conn = null;
@@ -295,9 +299,13 @@ public class MySQLClass {
 
                 while (rs.next()){
                     try{
+                        String user = rs.getString("user");
                         String message = rs.getString("message");
 
-                        list.add(message);
+
+                        userList.add(user);
+                        messageList.add(message);
+                        map.put(userList, messageList);
                     } catch (Exception e){
                         e.printStackTrace();
                     }
@@ -329,6 +337,6 @@ public class MySQLClass {
             e.printStackTrace();
         }
 
-        return list;
+        return map;
     }
 }
