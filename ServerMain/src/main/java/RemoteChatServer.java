@@ -17,6 +17,8 @@ public class RemoteChatServer implements Chat{
         return Arrays.asList(new Gson().fromJson(new FileReader(fileName), Rooms[].class));
     }
 
+
+
     @Override
     public String checkAuthorization(String login, String password) throws RemoteException {
         try{
@@ -74,17 +76,17 @@ public class RemoteChatServer implements Chat{
     public void incrementAuthorization(){countAuthorization++;}
 
     @Override
-    public String sendMessage(Integer room, String message) throws RemoteException {
+    public String sendMessage(Integer room, String message, String user) throws RemoteException {
 
-        sql.addMessage(room, countMessage, message);
+        sql.addMessage(room, countMessage, message, user);
         incrementMessage();
 
         return "";
     }
 
     @Override
-    public List<String> checkMessage(Integer room) throws RemoteException {
-        List<String> list = sql.checkLastMessages(room);
-        return list;
+    public Map<List<String>, List<String>> checkMessage(Integer room) throws RemoteException {
+        Map<List<String>, List<String>> map = sql.checkLastMessages(room);
+        return map;
     }
 }
