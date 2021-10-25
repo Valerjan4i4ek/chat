@@ -13,9 +13,7 @@ public class Client {
     public static final String UNIQUE_BINDING_NAME = "server.chat";
     static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
     private static User user;
-    private static String userName;
-    static Map<List<String>, List<String>> checkMap = new LinkedHashMap<>();
-
+    private static int maxId;
 
     public static void main(String[] args) throws IOException, NotBoundException, RemoteException {
 
@@ -71,20 +69,7 @@ public class Client {
                 new Thread(() -> {
                     while (!Thread.currentThread().isInterrupted()){
                         try {
-
-                            Thread.sleep(3000);
-                            checkLastMessage(finalI +1);
-
-                        } catch (InterruptedException | IOException | NotBoundException e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                }).start();
-
-                new Thread(() -> {
-                    while (!Thread.currentThread().isInterrupted()){
-                        try {
+//                            Thread.sleep(500);
                             sendMessage(finalI +1, reader.readLine(), user.getUserName());
 
                         } catch (IOException | NotBoundException e) {
@@ -92,6 +77,20 @@ public class Client {
                         }
 
                     }
+                }).start();
+
+                new Thread(() -> {
+                    while (!Thread.currentThread().isInterrupted()){
+                        try {
+
+                            Thread.sleep(3000);
+                            chating(finalI+1);
+
+                        } catch (InterruptedException | IOException | NotBoundException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
                 }).start();
 
             }
@@ -103,7 +102,7 @@ public class Client {
 
         Chat chat = (Chat) registry.lookup(UNIQUE_BINDING_NAME);
         String m = chat.sendMessage(room, message, userInMethod);
-//        SimpleDateFormat date = new SimpleDateFormat("HH:mm");
+
 //        System.out.println(user.getUserName() + " " + date.format(new Date()) + ": " + message);
         
     }
@@ -112,72 +111,31 @@ public class Client {
         final Registry registry = LocateRegistry.getRegistry("127.0.0.1",2732);
 
         Chat chat = (Chat) registry.lookup(UNIQUE_BINDING_NAME);
-        Map<List<String>, List<String>> map = chat.checkMessage(room);
-
-        checkMap = chat.checkMessage(room);
+        List<Message> list = chat.checkMessage(room);
 
         int count = 0;
+        maxId = list.get(list.size()-1).getId();
 
-        System.out.println();
-
-        for(Map.Entry<List<String>, List<String>> entry : map.entrySet()){
-            List<String> list1 = new ArrayList<>(entry.getKey());
-            List<String> list2 = new ArrayList<>(entry.getValue());
-            Collections.reverse(list1);
-            Collections.reverse(list2);
-            Iterator<String> it1 = list1.iterator();
-            Iterator<String> it2 = list2.iterator();
-            while (it1.hasNext() && it2.hasNext()){
-                count++;
-                if(count == 10){
-                    break;
-                }
-                System.out.println(it1.next() + ": " + it2.next());
+        for (int i = list.size()-1; i >= 0 ; i--) {
+            if(count==10){
+                break;
             }
-
+            System.out.println(list.get(i).getUser() + ": " + list.get(i).getMessage());
+            count++;
         }
-
     }
 
-
-    public static void checkLastMessage(Integer room) throws IOException, NotBoundException, RemoteException{
+    public static void chating(Integer room) throws IOException, NotBoundException, RemoteException{
         final Registry registry = LocateRegistry.getRegistry("127.0.0.1",2732);
 
         Chat chat = (Chat) registry.lookup(UNIQUE_BINDING_NAME);
-        Map<List<String>, List<String>> map = chat.checkMessage(room);
+
         SimpleDateFormat date = new SimpleDateFormat("HH:mm");
-
-        Set<List<String>> set1 = new TreeSet<List<String>>(map.keySet());
-        Set<List<String>> set2 = new TreeSet<List<String>>(checkMap.keySet());
-        set1.removeAll(set2);
-
-        for(Map.Entry<List<String>, List<String>> pair : map.entrySet()){
-            Iterator<String> it1 = pair.getKey().iterator();
-            Iterator<String> it2 = pair.getValue().iterator();
-            while (it1.hasNext() && it2.hasNext()){
-                System.out.println(date.format(new Date()) + " " + it1.next() + ": " + it2.next());
-            }
+        List<Message> list = chat.chating(room, maxId);
+        for (int i = 0; i < list.size(); i++) {
+            System.out.println(list.get(i).getUser() + " " + date.format(new Date()) + ": " + list.get(i).getMessage());
+            maxId++;
         }
-
-
-//        map.remove(checkMap);
-//        for(Map.Entry<List<String>, List<String>> pair : checkMap.entrySet()){
-//            Iterator<String> it1 = pair.getKey().iterator();
-//            Iterator<String> it2 = pair.getValue().iterator();
-//            if(!map.containsKey(it1) && !map.containsValue(it2)){
-//                while (it1.hasNext() && it2.hasNext()){
-//                    System.out.println(date.format(new Date()) + " " + it1.next() + ": " + it2.next());
-//                }
-//            }
-//
-//        }
-
-
-//        for (int i = 0; i < list.size(); i++) {
-//            System.out.println(user.getUserName() + " " + date.format(new Date()) + ": " + list.get(i));
-//            checkList.add(list.get(i));
-//            list.remove(list.get(i));
-//        }
     }
 
 }
