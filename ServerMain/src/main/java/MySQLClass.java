@@ -281,10 +281,8 @@ public class MySQLClass {
         return map;
     }
 
-    public Map<List<String>, List<String>> checkLastMessages(Integer room){
-        Map<List<String>, List<String>> map = new LinkedHashMap<>();
-        List<String> userList = new ArrayList<>();
-        List<String> messageList = new ArrayList<>();
+    public List<Message> checkMessage (Integer room){
+        List<Message> list = new LinkedList<>();
 
         try{
             Connection conn = null;
@@ -299,13 +297,13 @@ public class MySQLClass {
 
                 while (rs.next()){
                     try{
+                        int id = rs.getInt("id");
                         String user = rs.getString("user");
                         String message = rs.getString("message");
+                        Message m = new Message(id, user, message);
+                        list.add(m);
 
 
-                        userList.add(user);
-                        messageList.add(message);
-                        map.put(userList, messageList);
                     } catch (Exception e){
                         e.printStackTrace();
                     }
@@ -337,6 +335,8 @@ public class MySQLClass {
             e.printStackTrace();
         }
 
-        return map;
+        return list;
+
     }
+
 }
