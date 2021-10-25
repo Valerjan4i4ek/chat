@@ -9,6 +9,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class RemoteChatServer implements Chat{
     MySQLClass sql = new MySQLClass();
+    List<Message> listID;
     int countMessage;
     int countAuthorization;
     private final static String JSON_FILE_NAME = "C:\\Users\\Philosoph\\IdeaProjects\\chat\\ServerMain\\src\\rooms.json";
@@ -70,23 +71,43 @@ public class RemoteChatServer implements Chat{
     }
 
 
-    public void incrementMessage(){
-        countMessage++;
+    public void incrementMessage(int room){
+        listID = sql.checkMessage(room);
+        if(listID != null && !listID.isEmpty()){
+            countMessage = listID.get(listID.size()-1).getId();
+            countMessage++;
+        }else{
+            countMessage++;
+        }
+
     }
     public void incrementAuthorization(){countAuthorization++;}
 
     @Override
     public String sendMessage(Integer room, String message, String user) throws RemoteException {
 
+        incrementMessage(room);
         sql.addMessage(room, countMessage, message, user);
-        incrementMessage();
 
         return "";
     }
 
     @Override
-    public Map<List<String>, List<String>> checkMessage(Integer room) throws RemoteException {
-        Map<List<String>, List<String>> map = sql.checkLastMessages(room);
-        return map;
+    public List<Message> checkMessage(Integer room) throws RemoteException{
+        List<Message> list = sql.checkMessage(room);
+        return list;
     }
+
+    @Override
+    public List<Message> chating(Integer room, Integer maxId) throws RemoteException {
+        List<Message> list = sql.checkMessage(room);
+        List<Message> list2 = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
+            if(list.get(i).getId() > maxId){
+                list2.add(list.get(i));
+            }
+        }
+        return list2;
+    }
+
 }
