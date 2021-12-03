@@ -33,9 +33,10 @@ public class Client {
         String result = chat.checkAuthorization(name, password);
 
         System.out.println(result);
-        if(!result.equals("incorrect password")){
+        if(!result.equalsIgnoreCase("incorrect password")){
             chooseRoom();
         }
+        else {authorization();}
     }
 
 
@@ -55,6 +56,7 @@ public class Client {
 
         for (int i = 0; i < list.size(); i++) {
             if(choosingRoom.equals(list.get(i))){
+                chat.addUserInRoom(i+1, user.getUserName());
                 System.out.println();
                 System.out.println(user.getUserName() + " join to chat");
                 System.out.println();
@@ -64,12 +66,23 @@ public class Client {
 
                 System.out.println("Write your message end press Enter:");
 
+
                 int finalI = i;
 
                 new Thread(() -> {
                     while (!Thread.currentThread().isInterrupted()){
+                        try{
+                            Thread.sleep(10000);
+                            chat.addUserInRoom(finalI, user.getUserName());
+                        } catch (InterruptedException | RemoteException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+
+                new Thread(() -> {
+                    while (!Thread.currentThread().isInterrupted()){
                         try {
-//                            Thread.sleep(500);
                             sendMessage(finalI +1, reader.readLine(), user.getUserName());
 
                         } catch (IOException | NotBoundException e) {
@@ -82,15 +95,13 @@ public class Client {
                 new Thread(() -> {
                     while (!Thread.currentThread().isInterrupted()){
                         try {
-
-                            Thread.sleep(3000);
+                            Thread.sleep(500);
                             chating(finalI+1);
 
                         } catch (InterruptedException | IOException | NotBoundException e) {
                             e.printStackTrace();
                         }
                     }
-
                 }).start();
 
             }
@@ -102,9 +113,6 @@ public class Client {
 
         Chat chat = (Chat) registry.lookup(UNIQUE_BINDING_NAME);
         String m = chat.sendMessage(room, message, userInMethod);
-
-//        System.out.println(user.getUserName() + " " + date.format(new Date()) + ": " + message);
-        
     }
 
     public static void checkMessage(Integer room) throws IOException, NotBoundException, RemoteException{
@@ -133,8 +141,17 @@ public class Client {
         SimpleDateFormat date = new SimpleDateFormat("HH:mm");
         List<Message> list = chat.chating(room, maxId);
         for (int i = 0; i < list.size(); i++) {
-            System.out.println(list.get(i).getUser() + " " + date.format(new Date()) + ": " + list.get(i).getMessage());
-            maxId++;
+            String[] array = list.get(i).getMessage().split(" ");
+            if(array[0].equals("/users")){
+
+            }
+            else if(array[0].equals("/send")){
+
+            }
+            else{
+                System.out.println(list.get(i).getUser() + " " + date.format(new Date()) + ": " + list.get(i).getMessage());
+                maxId++;
+            }
         }
     }
 
