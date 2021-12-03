@@ -10,15 +10,19 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class RemoteChatServer implements Chat{
     MySQLClass sql = new MySQLClass();
     List<Message> listID;
+    List<User> listUsers;
+    User user;
     int countMessage;
     int countAuthorization;
     private final static String JSON_FILE_NAME = "C:\\Users\\Philosoph\\IdeaProjects\\chat\\ServerMain\\src\\rooms.json";
+    
+    public RemoteChatServer(){
+        checkUserInRoom();
+    }
 
     private static List<Rooms> jsonToRooms(String fileName) throws FileNotFoundException {
         return Arrays.asList(new Gson().fromJson(new FileReader(fileName), Rooms[].class));
     }
-
-
 
     @Override
     public String checkAuthorization(String login, String password) throws RemoteException {
@@ -34,26 +38,25 @@ public class RemoteChatServer implements Chat{
                     return "INCORRECT PASSWORD";
                 }
                 else{
-                    sql.addAuthorization(countAuthorization, new User(login, password));
                     incrementAuthorization();
+                    sql.addAuthorization(new User(countAuthorization, login, password));
                     System.out.println("NEW REGISTRATION");
                     return "NEW REGISTRATION";
                 }
             }
             else{
-                sql.addAuthorization(countAuthorization, new User(login, password));
                 incrementAuthorization();
+                sql.addAuthorization(new User(countAuthorization, login, password));
                 System.out.println("new registration");
                 return "new registration";
             }
-
         } catch (Exception e){
             e.printStackTrace();
         }
-
         return "";
-
     }
+
+
     @Override
     public List<String> chooseRoom() throws RemoteException {
         List<Rooms> roomList = null;
@@ -70,6 +73,40 @@ public class RemoteChatServer implements Chat{
         return list;
     }
 
+    @Override
+    public String addUserInRoom(Integer roomId, String userName) throws RemoteException {
+        listUsers = sql.checkAuthorization();
+
+        for (int i = 0; i < listUsers.size(); i++) {
+            if(listUsers.get(i).getUserName().equals(userName)){
+                sql.addUserInRoom(new UserInRoom(System.currentTimeMillis(), roomId, listUsers.get(i).getId(), userName));
+            }
+        }
+        return "";
+    }
+
+    @Override
+    public List<String> showUsersInRoom(Integer room) throws RemoteException {
+        List<String> list = new ArrayList<>();
+        Map<Integer, Map<Integer, String>> map = sql.checkUsersList();
+        Map<Integer, String> mapValues = new HashMap<>();
+
+
+
+
+
+        return list;
+    }
+
+    public void checkUserInRoom(){
+        List<UserInRoom> list = sql.checkUserInRoom();
+
+        for (int i = list.size()-1; i > 0; i--) {
+            if(System.currentTimeMillis() - list.get(i).getLustTimeClientUpdate() > 10000){
+                sql.deleteUserInRoom(list.get(i).getUserId());
+            }
+        }
+    }
 
     public void incrementMessage(int room){
         listID = sql.checkMessage(room);
@@ -81,7 +118,16 @@ public class RemoteChatServer implements Chat{
         }
 
     }
-    public void incrementAuthorization(){countAuthorization++;}
+    public void incrementAuthorization(){
+        listUsers = sql.checkAuthorization();
+        if(listUsers != null && !listUsers.isEmpty()){
+            countAuthorization = listUsers.get(listUsers.size()-1).getId();
+            countAuthorization++;
+        }
+        else{
+            countAuthorization++;
+        }
+    }
 
     @Override
     public String sendMessage(Integer room, String message, String user) throws RemoteException {
