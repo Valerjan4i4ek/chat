@@ -1,3 +1,5 @@
+import java.util.Objects;
+
 public class UserInRoom {
     private long lustTimeClientUpdate;
     private int roomId;
@@ -41,5 +43,18 @@ public class UserInRoom {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserInRoom that = (UserInRoom) o;
+        return lustTimeClientUpdate == that.lustTimeClientUpdate && roomId == that.roomId && userId == that.userId && Objects.equals(userName, that.userName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(lustTimeClientUpdate, roomId, userId, userName);
     }
 }
