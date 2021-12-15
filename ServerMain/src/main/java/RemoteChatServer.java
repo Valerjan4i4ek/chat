@@ -17,7 +17,7 @@ public class RemoteChatServer implements Chat{
     private final static String JSON_FILE_NAME = "C:\\Users\\Philosoph\\IdeaProjects\\chat\\ServerMain\\src\\rooms.json";
     
     public RemoteChatServer(){
-        checkUserInRoom();
+//        checkUserInRoom();
     }
 
     private static List<Rooms> jsonToRooms(String fileName) throws FileNotFoundException {
@@ -87,15 +87,21 @@ public class RemoteChatServer implements Chat{
 
     @Override
     public List<String> showUsersInRoom(Integer room) throws RemoteException {
-        List<String> list = new ArrayList<>();
-        Map<Integer, Map<Integer, String>> map = sql.checkUsersList();
-        Map<Integer, String> mapValues = new HashMap<>();
+        Map<List<Integer>, Map<List<Integer>, String>> map = sql.checkUsersList();
+        List<String> returnList = new ArrayList<>();
 
-
-
-
-
-        return list;
+        if(map != null && !map.isEmpty()){
+            for(Map.Entry<List<Integer>, Map<List<Integer>, String>> entry : map.entrySet()){
+                if(entry.getKey().contains(room)){
+                    for(Map.Entry<List<Integer>, String> pair : entry.getValue().entrySet()){
+                        if(!returnList.contains(pair.getValue())){
+                            returnList.add(pair.getValue());
+                        }
+                    }
+                }
+            }
+        }
+        return returnList;
     }
 
     public void checkUserInRoom(){
