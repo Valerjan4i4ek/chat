@@ -140,18 +140,30 @@ public class Client {
 
         SimpleDateFormat date = new SimpleDateFormat("HH:mm");
         List<Message> list = chat.chating(room, maxId);
-        for (int i = 0; i < list.size(); i++) {
-            String[] array = list.get(i).getMessage().split(" ");
-            if(array[0].equals("/users")){
 
-            }
-            else if(array[0].equals("/send")){
+        for (Message message : list) {
+            String[] array = message.getMessage().split(" ");
+            if (array[0].equals("/users")) {
+                showUsersInRoom(room);
+            } else if (array[0].equals("/send")) {
+                if (array[1].equals(message.getUser())) {
 
-            }
-            else{
-                System.out.println(list.get(i).getUser() + " " + date.format(new Date()) + ": " + list.get(i).getMessage());
+                }
+            } else {
+                System.out.println(message.getUser() + " " + date.format(new Date()) + ": " + message.getMessage());
                 maxId++;
             }
+        }
+    }
+
+    public static void showUsersInRoom(Integer room) throws IOException, NotBoundException, RemoteException{
+        final Registry registry = LocateRegistry.getRegistry("127.0.0.1",2732);
+
+        Chat chat = (Chat) registry.lookup(UNIQUE_BINDING_NAME);
+        List<String> usersList = chat.showUsersInRoom(room);
+        int i = 0;
+        for (String s : usersList) {
+            System.out.println(s);
         }
     }
 
