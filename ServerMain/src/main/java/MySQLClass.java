@@ -11,6 +11,7 @@ public class MySQLClass {
         tableAuthorizationCreate();
         rooms();
         tableUserInRoom();
+        tablePrivateMessages();
     }
 
     public Connection getConnection(String dbName) throws SQLException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
@@ -509,9 +510,11 @@ public class MySQLClass {
         return map;
     }
 
-    public Map<Integer, Map<Integer, String>> checkUsersList(){
-        Map<Integer, Map<Integer, String>> returnMap = new HashMap<>();
-        Map<Integer, String> map = new HashMap<>();
+    public Map<List<Integer>, Map<List<Integer>, String>> checkUsersList(){
+        Map<List<Integer>, Map<List<Integer>, String>> returnMap = new HashMap<>();
+        Map<List<Integer>, String> map = new HashMap<>();
+        List<Integer> roomIdList = new ArrayList<>();
+        List<Integer> userIdList = new ArrayList<>();
 
         try{
             Connection conn = null;
@@ -530,8 +533,10 @@ public class MySQLClass {
                         int userId = rs.getInt("userId");
                         String userName = rs.getString("userName");
 
-                        map.put(userId, userName);
-                        returnMap.put(roomId, map);
+                        roomIdList.add(roomId);
+                        userIdList.add(userId);
+                        map.put(userIdList, userName);
+                        returnMap.put(roomIdList, map);
 
                     } catch (Exception e){
                         e.printStackTrace();
