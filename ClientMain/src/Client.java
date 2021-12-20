@@ -83,6 +83,7 @@ public class Client {
                 new Thread(() -> {
                     while (!Thread.currentThread().isInterrupted()){
                         try {
+
                             sendMessage(finalI +1, reader.readLine(), user.getUserName());
 
                         } catch (IOException | NotBoundException e) {
@@ -112,7 +113,12 @@ public class Client {
         final Registry registry = LocateRegistry.getRegistry("127.0.0.1",2732);
 
         Chat chat = (Chat) registry.lookup(UNIQUE_BINDING_NAME);
-        String m = chat.sendMessage(room, message, userInMethod);
+        if(message.equals("/users")){
+            showUsersInRoom(room);
+        }
+        else{
+            String m = chat.sendMessage(room, message, userInMethod);
+        }
     }
 
     public static void checkMessage(Integer room) throws IOException, NotBoundException, RemoteException{
@@ -142,17 +148,8 @@ public class Client {
         List<Message> list = chat.chating(room, maxId);
 
         for (Message message : list) {
-            String[] array = message.getMessage().split(" ");
-            if (array[0].equals("/users")) {
-                showUsersInRoom(room);
-            } else if (array[0].equals("/send")) {
-                if (array[1].equals(message.getUser())) {
-
-                }
-            } else {
-                System.out.println(message.getUser() + " " + date.format(new Date()) + ": " + message.getMessage());
-                maxId++;
-            }
+            System.out.println(message.getUser() + " " + date.format(new Date()) + ": " + message.getMessage());
+            maxId++;
         }
     }
 
@@ -161,7 +158,7 @@ public class Client {
 
         Chat chat = (Chat) registry.lookup(UNIQUE_BINDING_NAME);
         List<String> usersList = chat.showUsersInRoom(room);
-        int i = 0;
+
         for (String s : usersList) {
             System.out.println(s);
         }
