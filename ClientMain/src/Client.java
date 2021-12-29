@@ -113,8 +113,13 @@ public class Client {
         final Registry registry = LocateRegistry.getRegistry("127.0.0.1",2732);
 
         Chat chat = (Chat) registry.lookup(UNIQUE_BINDING_NAME);
-        if(message.equals("/users")){
+        String[] s = message.split(" ");
+        if(message.equals("/users") || s[0].equals("/users")){
             showUsersInRoom(room);
+        }
+        else if(s[0].equals("/send")){
+
+            String pm = chat.sendPrivateMessage(message, userInMethod, s[1]);
         }
         else{
             String m = chat.sendMessage(room, message, userInMethod);
