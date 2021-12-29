@@ -11,9 +11,11 @@ public class RemoteChatServer implements Chat{
     MySQLClass sql = new MySQLClass();
     List<Message> listID;
     List<User> listUsers;
+    List<PrivateMessage> listPrivateMessage;
     User user;
     int countMessage;
     int countAuthorization;
+    int countPrivateMessage;
     private final static String JSON_FILE_NAME = "C:\\Users\\Philosoph\\IdeaProjects\\chat\\ServerMain\\src\\rooms.json";
     
     public RemoteChatServer(){
@@ -135,6 +137,17 @@ public class RemoteChatServer implements Chat{
         }
     }
 
+    public void incrementPrivateMessage(){
+        listPrivateMessage = sql.checkPrivateMessage();
+        if(listPrivateMessage != null && !listPrivateMessage.isEmpty()){
+            countPrivateMessage = listPrivateMessage.get(listPrivateMessage.size()-1).getId();
+            countPrivateMessage++;
+        }
+        else{
+            countPrivateMessage++;
+        }
+    }
+
     @Override
     public String sendMessage(Integer room, String message, String user) throws RemoteException {
 
@@ -145,8 +158,22 @@ public class RemoteChatServer implements Chat{
     }
 
     @Override
+    public String sendPrivateMessage(String message, String userSender, String userTaker) throws RemoteException {
+
+        incrementPrivateMessage();
+        sql.addPrivateMessage(countPrivateMessage, message, userSender, userTaker);
+        return "";
+    }
+
+    @Override
     public List<Message> checkMessage(Integer room) throws RemoteException{
         List<Message> list = sql.checkMessage(room);
+        return list;
+    }
+
+    @Override
+    public List<PrivateMessage> checkPrivateMessage() throws RemoteException {
+        List<PrivateMessage> list = sql.checkPrivateMessage();
         return list;
     }
 
