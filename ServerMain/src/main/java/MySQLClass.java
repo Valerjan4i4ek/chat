@@ -171,7 +171,7 @@ public class MySQLClass {
                 conn = getConnection("chat");
                 st = conn.createStatement();
                 st.executeUpdate("CREATE TABLE IF NOT EXISTS chat.privateMessages " +
-                        "(lustTimeClientUpdate BIGINT NOT NULL, message VARCHAR(20) NOT NULL, " +
+                        "(id INT NOT NULL, lustTimeClientUpdate BIGINT NOT NULL, message VARCHAR(20) NOT NULL, " +
                         "userSender VARCHAR(20) NOT NULL, userTaker VARCHAR(20) NOT NULL)");
             }
             finally {
@@ -265,18 +265,22 @@ public class MySQLClass {
         }
     }
 
-    public void addPrivateMessage(String message, String userSender, String userTaker){
+
+    public PrivateMessage addPrivateMessage(Integer id, String message, String userSender, String userTaker){
+        PrivateMessage privateMessage = null;
         try{
             Connection conn = null;
             PreparedStatement ps = null;
 
             try{
                 conn = getConnection("chat");
-                ps = conn.prepareStatement("INSERT INTO privateMessages (lustTimeClientUpdate, message, userSender, userTaker) VALUES (?, ?, ?, ?)");
-                ps.setLong(1, System.currentTimeMillis());
-                ps.setString(2, message);
-                ps.setString(3, userSender);
-                ps.setString(4, userTaker);
+                ps = conn.prepareStatement("INSERT INTO privateMessages (id, lustTimeClientUpdate, message, userSender, userTaker) VALUES (?, ?, ?, ?, ?)");
+                ps.setInt(1, id);
+                ps.setLong(2, System.currentTimeMillis());
+                ps.setString(3, message);
+                ps.setString(4, userSender);
+                ps.setString(5, userTaker);
+                privateMessage = new PrivateMessage(id, message, userSender, userTaker);
 
                 ps.executeUpdate();
             } finally {
@@ -298,6 +302,8 @@ public class MySQLClass {
         } catch (Exception e){
             e.printStackTrace();
         }
+
+        return privateMessage;
     }
 
     public Message addMessage(Integer room, Integer id, String message, String user){
@@ -624,6 +630,64 @@ public class MySQLClass {
         } catch (Exception e){
             e.printStackTrace();
         }
+        return list;
+    }
+
+    public List<PrivateMessage> checkPrivateMessage(){
+        List<PrivateMessage> list = new LinkedList<>();
+
+        try{
+            Connection conn = null;
+            PreparedStatement ps = null;
+            ResultSet rs = null;
+
+            try{
+                conn = getConnection("chat");
+                String query = "SELECT * FROM privateMessages";
+                ps = conn.prepareStatement(query);
+                rs = ps.executeQuery();
+
+                while (rs.next()){
+                    try{
+                        int id = rs.getInt("id");
+                        String message = rs.getString("message");
+                        String userSender = rs.getString("userSender");
+                        String userTaker = rs.getString("userTaker");
+                        PrivateMessage privateMessage = new PrivateMessage(id, message, userSender, userTaker);
+                        list.add(privateMessage);
+
+
+                    } catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            } finally {
+                try{
+                    if(conn != null){
+                        conn.close();
+                    }
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+                try{
+                    if(ps != null){
+                        ps.close();
+                    }
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+                try{
+                    if(rs != null){
+                        rs.close();
+                    }
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
         return list;
     }
 
