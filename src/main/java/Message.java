@@ -4,6 +4,7 @@ public class Message implements Serializable{
     private static final long serialVersionUID = 1L;
 
     private int id;
+    private long lustTimeClientUpdate;
     private String user;
     private String message;
 
@@ -19,6 +20,14 @@ public class Message implements Serializable{
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public long getLustTimeClientUpdate() {
+        return lustTimeClientUpdate;
+    }
+
+    public void setLustTimeClientUpdate(long lustTimeClientUpdate) {
+        this.lustTimeClientUpdate = lustTimeClientUpdate;
     }
 
     public String getUser() {
