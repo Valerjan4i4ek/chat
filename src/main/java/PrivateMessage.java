@@ -1,4 +1,8 @@
-public class PrivateMessage {
+import java.io.Serializable;
+
+public class PrivateMessage implements Serializable{
+    private static final long serialVersionUID = 1L;
+
     private int id;
     private long lustTimeClientUpdate;
     private String message;
