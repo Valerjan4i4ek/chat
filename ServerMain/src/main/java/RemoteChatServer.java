@@ -19,7 +19,7 @@ public class RemoteChatServer implements Chat{
     private final static String JSON_FILE_NAME = "C:\\Users\\Philosoph\\IdeaProjects\\chat\\ServerMain\\src\\rooms.json";
     
     public RemoteChatServer(){
-//        checkUserInRoom();
+        checkUserInRoom();
     }
 
     private static List<Rooms> jsonToRooms(String fileName) throws FileNotFoundException {
