@@ -70,7 +70,8 @@ public class MySQLClass {
             try{
                 conn = getConnection("chat");
                 st = conn.createStatement();
-                st.executeUpdate("CREATE TABLE IF NOT EXISTS chat.room" + i + "(id INT NOT NULL, message VARCHAR(100) NOT NULL, user VARCHAR(100) NOT NULL)");
+                st.executeUpdate("CREATE TABLE IF NOT EXISTS chat.room" + i +
+                        "(id INT NOT NULL, lustTimeClientUpdate BIGINT NOT NULL, message VARCHAR(100) NOT NULL, user VARCHAR(100) NOT NULL)");
             }
             finally {
                 try{
@@ -104,41 +105,7 @@ public class MySQLClass {
                 conn = getConnection("chat");
                 st = conn.createStatement();
                 st.executeUpdate("CREATE TABLE IF NOT EXISTS chat.message " +
-                        "(id INT NOT NULL, room INT NOT NULL, message VARCHAR(100) NOT NULL)");
-            }
-            finally {
-                try{
-                    if(conn != null){
-                        conn.close();
-                    }
-                } catch (Exception e){
-                    e.printStackTrace();
-                }
-                try{
-                    if(st != null){
-                        st.close();
-                    }
-                } catch (Exception e){
-                    e.printStackTrace();
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    public void tableUserInRoom(){
-        try{
-            Connection conn = null;
-            Statement st = null;
-            try{
-                conn = getConnection("chat");
-                st = conn.createStatement();
-                st.executeUpdate("CREATE TABLE IF NOT EXISTS chat.userInRoom " +
-                        "(lustTimeClientUpdate BIGINT NOT NULL, roomId INT NOT NULL, " +
-                        "userId INT NOT NULL, userName VARCHAR(20) NOT NULL)");
+                        "(id INT NOT NULL, lustTimeClientUpdate BIGINT NOT NULL, room INT NOT NULL, message VARCHAR(100) NOT NULL)");
             }
             finally {
                 try{
@@ -173,6 +140,40 @@ public class MySQLClass {
                 st.executeUpdate("CREATE TABLE IF NOT EXISTS chat.privateMessages " +
                         "(id INT NOT NULL, lustTimeClientUpdate BIGINT NOT NULL, message VARCHAR(20) NOT NULL, " +
                         "userSender VARCHAR(20) NOT NULL, userTaker VARCHAR(20) NOT NULL)");
+            }
+            finally {
+                try{
+                    if(conn != null){
+                        conn.close();
+                    }
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+                try{
+                    if(st != null){
+                        st.close();
+                    }
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public void tableUserInRoom(){
+        try{
+            Connection conn = null;
+            Statement st = null;
+            try{
+                conn = getConnection("chat");
+                st = conn.createStatement();
+                st.executeUpdate("CREATE TABLE IF NOT EXISTS chat.userInRoom " +
+                        "(lustTimeClientUpdate BIGINT NOT NULL, roomId INT NOT NULL, " +
+                        "userId INT NOT NULL, userName VARCHAR(20) NOT NULL)");
             }
             finally {
                 try{
@@ -314,10 +315,11 @@ public class MySQLClass {
 
             try{
                 conn = getConnection("chat");
-                ps = conn.prepareStatement("INSERT INTO room" + room + " (id, message, user) VALUES (?, ?, ?)");
+                ps = conn.prepareStatement("INSERT INTO room" + room + " (id, lustTimeClientUpdate, message, user) VALUES (?, ?, ?, ?)");
                 ps.setInt(1, id);
-                ps.setString(2, message);
-                ps.setString(3, user);
+                ps.setLong(2, System.currentTimeMillis());
+                ps.setString(3, message);
+                ps.setString(4, user);
                 m = new Message(id, message, user);
 
                 ps.executeUpdate();
