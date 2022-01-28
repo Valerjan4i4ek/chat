@@ -14,6 +14,7 @@ public class Client {
     static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
     private static User user;
     private static int maxId;
+    private static int maxPrivateId;
 
     public static void main(String[] args) throws IOException, NotBoundException, RemoteException {
 
@@ -105,6 +106,18 @@ public class Client {
                     }
                 }).start();
 
+                new Thread(() -> {
+                    while (!Thread.currentThread().isInterrupted()){
+                        try {
+                            Thread.sleep(500);
+                            privateChating();
+
+                        } catch (InterruptedException | IOException | NotBoundException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+
             }
         }
     }
@@ -151,6 +164,7 @@ public class Client {
 
         if(list != null && !list.isEmpty() && listP != null && !listP.isEmpty()){
             maxId = list.get(list.size()-1).getId();
+            maxPrivateId = listP.get(listP.size()-1).getId();
             for (int i = list.size()-1; i >= 0 ; i--) {
                 if(count==10){
                     break;
@@ -181,6 +195,19 @@ public class Client {
         for (Message message : list) {
             System.out.println(message.getUser() + " " + date.format(new Date()) + ": " + message.getMessage());
             maxId++;
+        }
+    }
+
+    public static void privateChating() throws IOException, NotBoundException, RemoteException{
+        final Registry registry = LocateRegistry.getRegistry("127.0.0.1",2732);
+
+        Chat chat = (Chat) registry.lookup(UNIQUE_BINDING_NAME);
+        SimpleDateFormat date = new SimpleDateFormat("HH:mm");
+        List<PrivateMessage> list = chat.privateChating(maxPrivateId);
+
+        for(PrivateMessage privateMessage : list){
+            System.out.println(privateMessage.getUserSender() + " " + date.format(new Date()) + ": " + privateMessage.getMessage() + " to " + privateMessage.getUserTaker());
+            maxPrivateId++;
         }
     }
 
