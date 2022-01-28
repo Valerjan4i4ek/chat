@@ -19,7 +19,7 @@ public class RemoteChatServer implements Chat{
     private final static String JSON_FILE_NAME = "C:\\Users\\Philosoph\\IdeaProjects\\chat\\ServerMain\\src\\rooms.json";
     
     public RemoteChatServer(){
-        checkUserInRoom();
+//        checkUserInRoom();
     }
 
     private static List<Rooms> jsonToRooms(String fileName) throws FileNotFoundException {
@@ -175,6 +175,18 @@ public class RemoteChatServer implements Chat{
     public List<PrivateMessage> checkPrivateMessage() throws RemoteException {
         List<PrivateMessage> list = sql.checkPrivateMessage();
         return list;
+    }
+
+    @Override
+    public List<PrivateMessage> privateChating(Integer maxPrivateId) throws RemoteException{
+        List<PrivateMessage> list = sql.checkPrivateMessage();
+        List<PrivateMessage> list2 = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
+            if(list.get(i).getId() > maxPrivateId){
+                list2.add(list.get(i));
+            }
+        }
+        return list2;
     }
 
     @Override
