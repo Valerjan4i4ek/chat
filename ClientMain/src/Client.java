@@ -206,7 +206,7 @@ public class Client {
         List<PrivateMessage> list = chat.privateChating(maxPrivateId);
 
         for(PrivateMessage privateMessage : list){
-            System.out.println(privateMessage.getUserSender() + " " + date.format(new Date()) + ": " + privateMessage.getMessage() + " to " + privateMessage.getUserTaker());
+            System.out.println(privateMessage.getUserSender() + " " + date.format(new Date()) + ": " + privateMessage.getMessage());
             maxPrivateId++;
         }
     }
