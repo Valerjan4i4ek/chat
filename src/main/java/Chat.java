@@ -14,7 +14,7 @@ public interface Chat extends Remote {
 
     List<Message> chating(Integer room, Integer maxId) throws RemoteException;
 
-    List<PrivateMessage> privateChating(Integer maxPrivateId) throws RemoteException;
+    List<PrivateMessage> privateChating(Integer maxPrivateId, String userTaker) throws RemoteException;
 
     String checkAuthorization(String login, String password) throws RemoteException;
 
