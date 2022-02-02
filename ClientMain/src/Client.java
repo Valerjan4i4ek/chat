@@ -110,7 +110,12 @@ public class Client {
                     while (!Thread.currentThread().isInterrupted()){
                         try {
                             Thread.sleep(500);
-                            privateChating();
+                            if(reader.readLine().equals("/send")){
+                                System.out.println("choose userTaker");
+
+                                privateChating(reader.readLine());
+                            }
+
 
                         } catch (InterruptedException | IOException | NotBoundException e) {
                             e.printStackTrace();
@@ -122,7 +127,7 @@ public class Client {
         }
     }
 
-    public static void sendMessage(Integer room, String message, String userInMethod) throws IOException, NotBoundException, RemoteException{
+    public static void sendMessage(Integer room, String message, String user) throws IOException, NotBoundException, RemoteException{
         final Registry registry = LocateRegistry.getRegistry("127.0.0.1",2732);
 
         Chat chat = (Chat) registry.lookup(UNIQUE_BINDING_NAME);
@@ -130,14 +135,24 @@ public class Client {
         if(message.equals("/users") || s[0].equals("/users")){
             showUsersInRoom(room);
         }
-        else if(s[0].equals("/send")){
-
-            String pm = chat.sendPrivateMessage(message, userInMethod, s[1]);
-        }
+//        else if(s[0].equals("/send")){
+//
+////            kick(s, 0);
+//            String pm = chat.sendPrivateMessage(message, user, s[1]);
+//        }
         else{
-            String m = chat.sendMessage(room, message, userInMethod);
+            String m = chat.sendMessage(room, message, user);
         }
     }
+
+//    public static void kick (String[] s, int index){
+//        List<String> list = new ArrayList<>(Arrays.asList(s));
+//        if(list != null && !list.isEmpty()){
+//            list.remove(index);
+//
+//            s = list.toArray(new String[list.size()]);
+//        }
+//    }
 
     public static void checkMessage(Integer room) throws IOException, NotBoundException, RemoteException{
         final Registry registry = LocateRegistry.getRegistry("127.0.0.1",2732);
@@ -198,12 +213,12 @@ public class Client {
         }
     }
 
-    public static void privateChating() throws IOException, NotBoundException, RemoteException{
+    public static void privateChating(String userTaker) throws IOException, NotBoundException, RemoteException{
         final Registry registry = LocateRegistry.getRegistry("127.0.0.1",2732);
 
         Chat chat = (Chat) registry.lookup(UNIQUE_BINDING_NAME);
         SimpleDateFormat date = new SimpleDateFormat("HH:mm");
-        List<PrivateMessage> list = chat.privateChating(maxPrivateId);
+        List<PrivateMessage> list = chat.privateChating(maxPrivateId, userTaker);
 
         for(PrivateMessage privateMessage : list){
             System.out.println(privateMessage.getUserSender() + " " + date.format(new Date()) + ": " + privateMessage.getMessage());
