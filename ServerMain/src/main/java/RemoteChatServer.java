@@ -172,17 +172,23 @@ public class RemoteChatServer implements Chat{
     }
 
     @Override
-    public List<PrivateMessage> checkPrivateMessage() throws RemoteException {
-        List<PrivateMessage> list = sql.checkPrivateMessage();
-        return list;
-    }
-
-    @Override
-    public List<PrivateMessage> privateChating(Integer maxPrivateId, String userTaker) throws RemoteException{
+    public List<PrivateMessage> checkPrivateMessage(String user) throws RemoteException {
         List<PrivateMessage> list = sql.checkPrivateMessage();
         List<PrivateMessage> list2 = new ArrayList<>();
         for (int i = 0; i < list.size(); i++) {
-            if(list.get(i).getId() > maxPrivateId && list.get(i).getUserTaker().equals(userTaker)){
+            if(list.get(i).getUserTaker().equals(user)){
+                list2.add(list.get(i));
+            }
+        }
+        return list2;
+    }
+
+    @Override
+    public List<PrivateMessage> privateChating(Integer maxPrivateId, String user) throws RemoteException{
+        List<PrivateMessage> list = sql.checkPrivateMessage();
+        List<PrivateMessage> list2 = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
+            if(list.get(i).getId() > maxPrivateId && list.get(i).getUserTaker().equals(user)){
                 list2.add(list.get(i));
             }
         }
