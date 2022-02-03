@@ -128,14 +128,20 @@ public class Client {
 
         Chat chat = (Chat) registry.lookup(UNIQUE_BINDING_NAME);
         String[] s = message.split(" ");
-        int i = 0;
+//        int i = 0;
+
 
         if(message.equals("/users") || s[0].equals("/users")){
             showUsersInRoom(room);
         }
         else if(s[0].equals("/send")){
-            i = Arrays.asList(s).indexOf(s[2]);
-            String pm = chat.sendPrivateMessage(message.substring(i), user, s[1]);
+//            i = Arrays.asList(s).indexOf(s[2]);
+            StringBuffer buffer = new StringBuffer();
+            for (int j = 0; j < s.length; j++) {
+                buffer.append(s[2]);
+            }
+            String result = buffer.toString();
+            String pm = chat.sendPrivateMessage(result, user, s[1]);
         }
         else{
             String m = chat.sendMessage(room, message, user);
