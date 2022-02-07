@@ -176,7 +176,7 @@ public class RemoteChatServer implements Chat{
         List<PrivateMessage> list = sql.checkPrivateMessage();
         List<PrivateMessage> list2 = new ArrayList<>();
         for (int i = 0; i < list.size(); i++) {
-            if(list.get(i).getUserTaker().equals(user)){
+            if(list.get(i).getUserSender().equals(user)){
                 list2.add(list.get(i));
             }
         }
