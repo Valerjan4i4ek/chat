@@ -17,7 +17,7 @@ public class RemoteChatServer implements Chat{
     int countAuthorization;
     int countPrivateMessage;
     private final static String JSON_FILE_NAME = "C:\\Users\\Philosoph\\IdeaProjects\\chat\\ServerMain\\src\\rooms.json";
-    
+
     public RemoteChatServer(){
 //        checkUserInRoom();
     }
@@ -137,10 +137,11 @@ public class RemoteChatServer implements Chat{
         }
     }
 
-    public void incrementPrivateMessage(){
-        listPrivateMessage = sql.checkPrivateMessage();
+    public void incrementPrivateMessage(String userTaker){
+        listPrivateMessage = sql.checkPrivateMessage(userTaker);
         if(listPrivateMessage != null && !listPrivateMessage.isEmpty()){
-            countPrivateMessage = listPrivateMessage.get(listPrivateMessage.size()-1).getId();
+//            countPrivateMessage = listPrivateMessage.get(listPrivateMessage.size()-1).getId();
+            countPrivateMessage = listPrivateMessage.size();
             countPrivateMessage++;
         }
         else{
@@ -160,7 +161,7 @@ public class RemoteChatServer implements Chat{
     @Override
     public String sendPrivateMessage(String message, String userSender, String userTaker) throws RemoteException {
 
-        incrementPrivateMessage();
+        incrementPrivateMessage(userTaker);
         sql.addPrivateMessage(countPrivateMessage, message, userSender, userTaker);
         return "";
     }
@@ -173,24 +174,28 @@ public class RemoteChatServer implements Chat{
 
     @Override
     public List<PrivateMessage> checkPrivateMessage(String user) throws RemoteException {
-        List<PrivateMessage> list = sql.checkPrivateMessage();
-        List<PrivateMessage> list2 = new ArrayList<>();
-        for (int i = 0; i < list.size(); i++) {
-            if(list.get(i).getUserSender().equals(user)){
-                list2.add(list.get(i));
-            }
-        }
-        return list2;
+        List<PrivateMessage> list = sql.checkPrivateMessage(user);
+//        List<PrivateMessage> list2 = new ArrayList<>();
+//        for (int i = 0; i < list.size(); i++) {
+//            if(list.get(i).getUserTaker().equals(user)){
+//                list2.add(list.get(i));
+//            }
+//        }
+//        return list2;
+        return list;
     }
 
     @Override
     public List<PrivateMessage> privateChating(Integer maxPrivateId, String user) throws RemoteException{
-        List<PrivateMessage> list = sql.checkPrivateMessage();
+        List<PrivateMessage> list = sql.checkPrivateMessage(user);
         List<PrivateMessage> list2 = new ArrayList<>();
         for (int i = 0; i < list.size(); i++) {
             if(list.get(i).getId() > maxPrivateId && list.get(i).getUserTaker().equals(user)){
                 list2.add(list.get(i));
             }
+//            if(list.get(i).getId() > maxPrivateId){
+//                list2.add(list.get(i));
+//            }
         }
         return list2;
     }
