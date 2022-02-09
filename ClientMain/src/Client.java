@@ -130,18 +130,18 @@ public class Client {
         String[] s = message.split(" ");
 //        int i = 0;
 
-
         if(message.equals("/users") || s[0].equals("/users")){
             showUsersInRoom(room);
         }
         else if(s[0].equals("/send")){
 //            i = Arrays.asList(s).indexOf(s[2]);
-            StringBuffer buffer = new StringBuffer();
-            for (int j = 0; j < s.length; j++) {
-                buffer.append(s[2]);
+            StringBuilder buffer = new StringBuilder();
+            for (int j = 2; j < s.length; j++) {
+                buffer.append(s[j]);
             }
             String result = buffer.toString();
             String pm = chat.sendPrivateMessage(result, user, s[1]);
+//            String pm = chat.sendPrivateMessage(message, user, s[1]);
         }
         else{
             String m = chat.sendMessage(room, message, user);
@@ -160,7 +160,8 @@ public class Client {
 
         if(list != null && !list.isEmpty() && listP != null && !listP.isEmpty()){
             maxId = list.get(list.size()-1).getId();
-            maxPrivateId = listP.get(listP.size()-1).getId();
+//            maxPrivateId = listP.get(listP.size()-1).getId();
+            maxPrivateId = listP.size();
             for (int i = list.size()-1; i >= 0 ; i--) {
                 if(count==10){
                     break;
