@@ -172,7 +172,7 @@ public class Client {
                 }
                 else{
                     System.out.println(listP.get(listP.size()-1).getUserSender() + ": " + listP.get(listP.size()-1).getMessage());
-                    listP.remove(listP.get(listP.size()-1));
+//                    listP.remove(listP.get(listP.size()-1));
                     count++;
                 }
             }
